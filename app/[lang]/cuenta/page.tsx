@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { profileLinks } from "@/lib/profile-links";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -24,7 +25,7 @@ export default async function Account({ params, searchParams }: {
   const msg = messages[(await searchParams).msg ?? ""];
   const title = t("Mi cuenta", "My account");
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)
-    return <main className="account-page"><div className="account account-narrow"><h1>{title}</h1><p>{t("El acceso está temporalmente fuera de servicio.", "Account access is temporarily unavailable.")}</p></div></main>;
+    return <main className="account-page"><div className="account account-narrow"><Breadcrumbs lang={lang} current={title} /><h1>{title}</h1><p>{t("El acceso está temporalmente fuera de servicio.", "Account access is temporarily unavailable.")}</p></div></main>;
   const client = await accountClient();
   const { data: { user } } = await client.auth.getUser();
   const { data: profile } = user ? await client.from("profiles").select("*").eq("id", user.id).single() : { data: null };
@@ -32,6 +33,7 @@ export default async function Account({ params, searchParams }: {
   const photo = user ? (await client.from("profile_photos").select("profile_id").eq("profile_id", user.id).maybeSingle()).data : null;
   const language = <input type="hidden" name="lang" value={lang} />;
   return <main className="account-page"><div className={user ? "account account-narrow" : "account"}>
+    <Breadcrumbs lang={lang} parent={profile?.status === "approved" ? "espacio" : undefined} current={title} />
     <h1>{title}</h1>{msg && <p role="status">{msg}</p>}
     {!user ? <div className="account-columns">{["login", "register"].map(action => {
       const register = action === "register";
