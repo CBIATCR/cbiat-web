@@ -22,4 +22,4 @@ export async function proxy(request: NextRequest) {
   return response;
 }
 
-export const config = { matcher: ["/", "/:lang/cuenta/:path*", "/:lang/espacio/:path*", "/admin/:path*"] };
+export const config = { matcher: ["/", "/:lang/cuenta/:path*", "/:lang/espacio/:path*", "/:lang/admin/:path*"] };
