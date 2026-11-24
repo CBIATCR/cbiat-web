@@ -25,7 +25,7 @@ export default async function Admin({ params, searchParams }: {
     const {error} = await session.rpc("review_account",{target:form.get("id"),account_status:form.get("status"),account_role:form.get("role")});
     redirect("/"+lang+"/admin?result="+(error?"error":"ok"));
   }
-  return <main className="work"><div className="shell account"><h1>{es?"Administrar cuentas":"Manage accounts"}</h1>
+  return <main className="account-page"><div className="account"><h1>{es?"Administrar cuentas":"Manage accounts"}</h1>
     <form><label>{es?"Estado":"Status"}<select name="status" defaultValue={status ?? ""}><option value="">{es?"Todos":"All"}</option>{states.map(s=><option key={s} value={s}>{labels[s]}</option>)}</select></label><button>{es?"Filtrar":"Filter"}</button></form>
     {result && <p role="status">{result==="ok"?(es?"Cambios guardados.":"Changes saved."):(es?"No se pudo guardar.":"Unable to save.")}</p>}
     {error && <p role="alert">{es?"No se pudo cargar la lista.":"Unable to load accounts."}</p>}
