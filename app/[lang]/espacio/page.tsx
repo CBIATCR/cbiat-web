@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n";
@@ -21,6 +22,7 @@ export default async function MemberSpace({params}: {params: Promise<{lang:strin
   return (
     <main className="account-page">
       <div className="account chamber-space">
+        <Breadcrumbs lang={lang} current={es ? "Espacio de la Cámara" : "Chamber space"} />
         <h1>{es ? "Espacio de la Cámara" : "Chamber space"}</h1>
         <section className="chamber-profile" aria-labelledby="profile-name">
           <div className="chamber-identity">
