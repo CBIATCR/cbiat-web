@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { notFound, redirect } from "next/navigation";
 import { accountClient } from "@/lib/supabase/server";
 import { isLocale } from "@/lib/i18n";
@@ -49,7 +50,7 @@ export default async function Admin({ params, searchParams }: {
     const {error} = await session.rpc("review_account",{target:form.get("id"),account_status:form.get("status"),account_role:form.get("role")});
     redirect("/"+lang+"/admin?result="+(error?"error":"ok"));
   }
-  return <main className="account-page"><div className="account"><h1>{es?"Administrar cuentas":"Manage accounts"}</h1>
+  return <main className="account-page"><div className="account"><Breadcrumbs lang={lang} parent="espacio" current={es ? "Administrar cuentas" : "Manage accounts"} /><h1>{es?"Administrar cuentas":"Manage accounts"}</h1>
     <form><label>{es?"Estado":"Status"}<select name="status" defaultValue={status ?? ""}><option value="">{es?"Todos":"All"}</option>{states.map(s=><option key={s} value={s}>{labels[s]}</option>)}</select></label><button>{es?"Filtrar":"Filter"}</button></form>
     <details><summary>{es?"Crear comisión":"Create commission"}</summary>
       <form action={manageGroup}>
