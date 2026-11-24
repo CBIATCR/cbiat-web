@@ -21,12 +21,12 @@ export default async function Account({ params, searchParams }: {
   const msg = messages[(await searchParams).msg ?? ""];
   const title = t("Mi cuenta", "My account");
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)
-    return <main className="work"><div className="shell"><h1>{title}</h1><p>{t("El acceso está temporalmente fuera de servicio.", "Account access is temporarily unavailable.")}</p></div></main>;
+    return <main className="account-page"><div className="account account-narrow"><h1>{title}</h1><p>{t("El acceso está temporalmente fuera de servicio.", "Account access is temporarily unavailable.")}</p></div></main>;
   const client = await accountClient();
   const { data: { user } } = await client.auth.getUser();
   const { data: profile } = user ? await client.from("profiles").select("*").eq("id", user.id).single() : { data: null };
   const language = <input type="hidden" name="lang" value={lang} />;
-  return <main className="work"><div className="shell account">
+  return <main className="account-page"><div className={user ? "account account-narrow" : "account"}>
     <h1>{title}</h1>{msg && <p role="status">{msg}</p>}
     {!user ? <div className="account-columns">{["login", "register"].map(action => {
       const register = action === "register";
@@ -43,7 +43,7 @@ export default async function Account({ params, searchParams }: {
     })}</div> : <>
       <p>{user.email}</p>
       <p>{!profile ? t("No se pudo cargar tu perfil.","Your profile could not be loaded.") : profile.status === "approved" ? t("Cuenta habilitada.","Account approved.") : profile.status === "pending" ? t("Tu cuenta está en revisión. Podés completar tu perfil mientras esperás.","Your account is under review. You can complete your profile while you wait.") : t("Tu cuenta está deshabilitada.","Your account is disabled.")}</p>
-      {profile && ["approved","pending"].includes(profile.status) && <form action={saveProfile}>
+      {profile && ["approved","pending"].includes(profile.status) && <form className="profile-fields" action={saveProfile}>
         <h2>{t("Mi perfil","My profile")}</h2>{language}
         {Object.entries({ full_name: t("Nombre completo","Full name"), organization: t("Organización","Organization"), title: t("Cargo","Job title"), phone: t("Teléfono privado","Private phone") }).map(([key,label]) =>
           <label key={key}>{label}<input name={key} defaultValue={profile[key] ?? ""} required={key === "full_name"} maxLength={key === "full_name" ? 150 : 200}/></label>)}
