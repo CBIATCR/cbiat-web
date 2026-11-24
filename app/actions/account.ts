@@ -1,4 +1,5 @@
 "use server";
+import { socialNetwork } from "@/lib/profile-links";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { accountClient } from "@/lib/supabase/server";
@@ -42,7 +43,11 @@ export async function saveProfile(form: FormData) {
   if (!user) redirect(path);
   const full_name = value(form, "full_name");
   const biography = value(form, "biography");
-  const social_links = value(form, "social_links").split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  const linkedin = value(form, "linkedin");
+  const x = value(form, "x");
+  if ((linkedin && socialNetwork(linkedin) !== "LinkedIn") || (x && socialNetwork(x) !== "X")) redirect(path + "?msg=invalid");
+  const other = value(form, "social_links").split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  const social_links = Array.from(new Set([linkedin, x, ...other].filter(Boolean)));
   const fields = { organization: value(form,"organization"), title: value(form,"title"), phone: value(form,"phone") };
   if (!full_name || full_name.length > 150 || biography.length > 2000 || Object.values(fields).some(s => s.length > 200) ||
       social_links.length > 8 || social_links.some(s => { try { return s.length > 2048 || !["https:", "http:"].includes(new URL(s).protocol); } catch { return true; } })) redirect(path + "?msg=invalid");
