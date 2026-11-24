@@ -1,4 +1,5 @@
 "use server";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { accountClient } from "@/lib/supabase/server";
 
@@ -21,12 +22,15 @@ export async function submitAccount(form: FormData) {
   if (action === "register") {
     const name = value(form, "full_name");
     if (!name || name.length > 150 || password.length < 8) redirect(path + "?msg=invalid");
-    const { data, error } = await client.auth.signUp({ email, password, options: { data: { full_name: name } } });
+    const origin = (await headers()).get("origin");
+    const emailRedirectTo = origin ? new URL(path + "/confirmar", origin).toString() : undefined;
+    const { data, error } = await client.auth.signUp({ email, password, options: { emailRedirectTo, data: { full_name: name } } });
     if (error) redirect(path + "?msg=error");
-    redirect(path + (data.session ? "" : "?msg=verify"));
+    redirect(path + (data.session ? "" : "/verificar"));
   }
   if (action !== "login") redirect(path + "?msg=invalid");
   const { error } = await client.auth.signInWithPassword({ email, password });
+  if (error?.code === "email_not_confirmed") redirect(path + "/verificar");
   redirect(path + (error ? "?msg=error" : ""));
 }
 
