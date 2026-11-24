@@ -1,3 +1,5 @@
+import { accountClient } from "@/lib/supabase/server";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import styles from "./directory.module.css";
 import { socialNetwork } from "@/lib/profile-links";
 import Link from "next/link";
@@ -45,6 +47,15 @@ function socialLink(value: string) {
   }
 }
 
+async function canEnterSpace() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) return false;
+  const client = await accountClient();
+  const { data: { user } } = await client.auth.getUser();
+  if (!user) return false;
+  const { data } = await client.from("profiles").select("status").eq("id", user.id).maybeSingle();
+  return data?.status === "approved";
+}
+
 export default async function Directory({ params, searchParams }: {
   params: Promise<{ lang: string }>;
   searchParams: Promise<{ grupo?: string }>;
@@ -53,7 +64,7 @@ export default async function Directory({ params, searchParams }: {
   if (!isLocale(lang)) notFound();
   const es = lang === "es";
   const selected = (await searchParams).grupo;
-  const people = await loadPeople();
+  const [people, member] = await Promise.all([loadPeople(), canEnterSpace()]);
   const groups = new Map<string, Group>();
   for (const person of people ?? []) {
     for (const group of person.groups) groups.set(group.id, group);
@@ -64,6 +75,7 @@ export default async function Directory({ params, searchParams }: {
   const options = Array.from(groups.values()).sort((a,b) => (es ? a.name_es : a.name_en).localeCompare(es ? b.name_es : b.name_en, lang));
   return (
     <main className={styles.page}><div className={styles.inner}>
+      <div style={{marginBottom: "0.75rem"}}><Breadcrumbs lang={lang} parent={member ? "espacio" : undefined} current={es ? "Directorio de personas" : "People directory"} /></div>
       <header className={styles.heading}>
         <h1>{es ? "Directorio de personas" : "People directory"}</h1>
         {visible && <span className={styles.count}>{visible.length} {es ? (visible.length === 1 ? "perfil" : "perfiles") : (visible.length === 1 ? "profile" : "profiles")}</span>}
