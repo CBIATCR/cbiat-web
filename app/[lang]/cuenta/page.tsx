@@ -52,6 +52,7 @@ export default async function Account({ params, searchParams }: {
         <label><input type="checkbox" name="is_public" defaultChecked={profile.is_public}/> {t("Mostrar mi perfil en el directorio cuando mi cuenta esté habilitada","List my profile in the directory when my account is approved")}</label>
         <button className="button button-dark">{t("Guardar perfil","Save profile")}</button>
       </form>}
+      {profile?.status === "approved" && profile.role === "admin" && <Link href={`/${lang}/admin`}>{t("Administrar cuentas","Manage accounts")}</Link>}
       {profile?.status === "approved" && <Link href={`/${lang}/espacio`}>{t("Ir al espacio de la Cámara","Visit the Chamber space")}</Link>}
       <form action={submitAccount}>{language}<button className="button" name="action" value="logout">{t("Cerrar sesión","Sign out")}</button></form>
     </>}
