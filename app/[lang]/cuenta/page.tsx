@@ -1,3 +1,4 @@
+import { profileLinks } from "@/lib/profile-links";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isLocale } from "@/lib/i18n";
@@ -26,6 +27,7 @@ export default async function Account({ params, searchParams }: {
   const client = await accountClient();
   const { data: { user } } = await client.auth.getUser();
   const { data: profile } = user ? await client.from("profiles").select("*").eq("id", user.id).single() : { data: null };
+  const links = profileLinks(profile?.social_links ?? []);
   const language = <input type="hidden" name="lang" value={lang} />;
   return <main className="account-page"><div className={user ? "account account-narrow" : "account"}>
     <h1>{title}</h1>{msg && <p role="status">{msg}</p>}
@@ -49,7 +51,9 @@ export default async function Account({ params, searchParams }: {
         {Object.entries({ full_name: t("Nombre completo","Full name"), organization: t("Organización","Organization"), title: t("Cargo","Job title"), phone: t("Teléfono privado","Private phone") }).map(([key,label]) =>
           <label key={key}>{label}<input name={key} defaultValue={profile[key] ?? ""} required={key === "full_name"} maxLength={key === "full_name" ? 150 : 200}/></label>)}
         <label>{t("Biografía","Bio")}<textarea name="biography" defaultValue={profile.biography ?? ""} maxLength={2000}/></label>
-        <label>{t("Redes sociales (un enlace por línea)","Social links (one per line)")}<textarea name="social_links" defaultValue={profile.social_links.join("\n")}/></label>
+        <label>LinkedIn<input type="url" name="linkedin" placeholder="https://www.linkedin.com/in/…" defaultValue={links.linkedin} maxLength={2048}/></label>
+        <label>X<input type="url" name="x" placeholder="https://x.com/…" defaultValue={links.x} maxLength={2048}/></label>
+        {links.other.length > 0 && <label>{t("Otros enlaces (uno por línea)","Other links (one per line)")}<textarea name="social_links" defaultValue={links.other.join("\n")}/></label>}
         <label><input type="checkbox" name="is_public" defaultChecked={profile.is_public}/> {t("Mostrar mi perfil en el directorio cuando mi cuenta esté habilitada","List my profile in the directory when my account is approved")}</label>
         <button className="button button-dark">{t("Guardar perfil","Save profile")}</button>
       </form>}
