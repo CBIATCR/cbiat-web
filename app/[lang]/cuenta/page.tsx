@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isLocale } from "@/lib/i18n";
 import { accountClient } from "@/lib/supabase/server";
-import { submitAccount, saveProfile } from "@/app/actions/account";
+import { submitAccount, saveProfile, changePhoto } from "@/app/actions/account";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +18,7 @@ export default async function Account({ params, searchParams }: {
     error: t("No se pudo completar la operación. Revisá tus datos e intentá de nuevo.", "We could not complete the request. Check your details and try again."),
     verify: t("Revisá tu correo, confirmá la cuenta y luego iniciá sesión aquí.", "Check your email, confirm your account, then sign in here."),
     signin: t("Iniciá sesión con tu correo y contraseña. Si todavía no confirmaste el correo, revisá el enlace recibido.", "Sign in with your email and password. If you have not confirmed your email yet, check your confirmation link."),
+    photo: t("Usá una foto JPG o PNG de hasta 512 KB.", "Choose a JPG or PNG photo up to 512 KB."),
     saved: t("Perfil guardado.", "Profile saved."),
   };
   const msg = messages[(await searchParams).msg ?? ""];
@@ -28,6 +29,7 @@ export default async function Account({ params, searchParams }: {
   const { data: { user } } = await client.auth.getUser();
   const { data: profile } = user ? await client.from("profiles").select("*").eq("id", user.id).single() : { data: null };
   const links = profileLinks(profile?.social_links ?? []);
+  const photo = user ? (await client.from("profile_photos").select("profile_id").eq("profile_id", user.id).maybeSingle()).data : null;
   const language = <input type="hidden" name="lang" value={lang} />;
   return <main className="account-page"><div className={user ? "account account-narrow" : "account"}>
     <h1>{title}</h1>{msg && <p role="status">{msg}</p>}
@@ -46,6 +48,16 @@ export default async function Account({ params, searchParams }: {
     })}</div> : <>
       <p>{user.email}</p>
       <p>{!profile ? t("No se pudo cargar tu perfil.","Your profile could not be loaded.") : profile.status === "approved" ? t("Cuenta habilitada.","Account approved.") : profile.status === "pending" ? t("Tu cuenta está en revisión. Podés completar tu perfil mientras esperás.","Your account is under review. You can complete your profile while you wait.") : t("Tu cuenta está deshabilitada.","Your account is disabled.")}</p>
+      {profile && ["approved","pending"].includes(profile.status) && <section>
+        <h2>{t("Foto de perfil","Profile photo")}</h2>
+        {photo && <img src={`/api/profile-photo/${profile.id}`} alt={profile.full_name} width={96} height={96} style={{objectFit:"cover",borderRadius:"50%"}}/>}
+        <form action={changePhoto}>
+          {language}
+          <label>{t("Foto JPG o PNG, hasta 512 KB","JPG or PNG photo, up to 512 KB")}<input type="file" accept="image/jpeg,image/png" name="photo" required/></label>
+          <button className="button button-dark">{t("Guardar foto","Save photo")}</button>
+        </form>
+        {photo && <form action={changePhoto}>{language}<button name="operation" value="remove">{t("Quitar foto","Remove photo")}</button></form>}
+      </section>}
       {profile && ["approved","pending"].includes(profile.status) && <form className="profile-fields" action={saveProfile}>
         <h2>{t("Mi perfil","My profile")}</h2>{language}
         {Object.entries({ full_name: t("Nombre completo","Full name"), organization: t("Organización","Organization"), title: t("Cargo","Job title"), phone: t("Teléfono privado","Private phone") }).map(([key,label]) =>
