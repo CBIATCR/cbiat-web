@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 
 type Group = { id: string; name_es: string; name_en: string };
 type Person = {
+  has_photo: boolean;
   id: string;
   full_name: string;
   organization: string | null;
@@ -21,7 +22,7 @@ async function loadPeople(): Promise<Person[] | null> {
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) return null;
   try {
-    const response = await fetch(new URL("/rest/v1/rpc/directory_people_with_groups", url), {
+    const response = await fetch(new URL("/rest/v1/rpc/directory_cards", url), {
       method: "POST",
       headers: { apikey: key, "Content-Type": "application/json" },
       body: "{}",
@@ -77,6 +78,7 @@ export default async function Directory({ params, searchParams }: {
         <div className="cards">
           {visible?.map(p => (
             <article key={p.id}>
+              {p.has_photo && <img src={`/api/profile-photo/${p.id}`} alt="" loading="lazy" width={72} height={72} style={{objectFit:"cover",borderRadius:"50%"}}/>}
               <h2>{p.full_name}</h2>
               <p>{[p.title, p.organization].filter(Boolean).join(" · ")}</p>
               {p.biography && <p>{p.biography}</p>}
