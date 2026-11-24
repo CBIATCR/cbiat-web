@@ -1,3 +1,4 @@
+import styles from "./admin.module.css";
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { notFound, redirect } from "next/navigation";
@@ -51,10 +52,15 @@ export default async function Admin({ params, searchParams }: {
     const {error} = await session.rpc("review_account",{target:form.get("id"),account_status:form.get("status"),account_role:form.get("role")});
     redirect("/"+lang+"/admin?result="+(error?"error":"ok"));
   }
-  return <main className="account-page"><div className="account"><Breadcrumbs lang={lang} parent="espacio" current={es ? "Administrar cuentas" : "Manage accounts"} /><h1>{es?"Administrar cuentas":"Manage accounts"}</h1>
-    <Link href={`/${lang}/admin/organizaciones`}>{es ? "Revisar organizaciones →" : "Review organizations →"}</Link>
-    <form><label>{es?"Estado":"Status"}<select name="status" defaultValue={status ?? ""}><option value="">{es?"Todos":"All"}</option>{states.map(s=><option key={s} value={s}>{labels[s]}</option>)}</select></label><button>{es?"Filtrar":"Filter"}</button></form>
-    <details><summary>{es?"Crear comisión":"Create commission"}</summary>
+  return <main className="account-page"><div className={`account ${styles.panel}`}><Breadcrumbs lang={lang} parent="espacio" current={es ? "Administrar cuentas" : "Manage accounts"} /><h1>{es?"Administrar cuentas":"Manage accounts"}</h1>
+<nav className={styles.tabs} aria-label={es?"Administración":"Administration"}>
+      <Link href={`/${lang}/admin`} aria-current="page">{es?"Cuentas":"Accounts"}</Link>
+      <Link href={`/${lang}/admin/organizaciones`} >{es?"Organizaciones":"Organizations"}</Link>
+    </nav>
+    <nav className={styles.filters} aria-label={es?"Filtrar por estado":"Filter by status"}>
+      {["",...states].map(s=><Link key={s} href={s ? `/${lang}/admin?status=${s}` : `/${lang}/admin`} aria-current={(status ?? "")===s?"page":undefined}>{s ? labels[s] : (es?"Todas":"All")}</Link>)}
+    </nav>
+    <details className={styles.tool}><summary>{es?"Crear comisión":"Create commission"}</summary>
       <form action={manageGroup}>
         <label>{es?"Nombre en español":"Spanish name"}<input name="name_es" maxLength={120} required/></label>
         <label>{es?"Nombre en inglés":"English name"}<input name="name_en" maxLength={120} required/></label>
@@ -63,11 +69,12 @@ export default async function Admin({ params, searchParams }: {
     </details>
     {result && <p role="status">{result==="ok"?(es?"Cambios guardados.":"Changes saved."):(es?"No se pudo guardar.":"Unable to save.")}</p>}
     {error && <p role="alert">{es?"No se pudo cargar la lista.":"Unable to load accounts."}</p>}
-    {(data as Entry[]|null)?.map(p=><article key={p.id}><h2>{p.full_name || p.email}</h2><p>{[p.email,p.organization,p.title,new Date(p.applied_at).toLocaleDateString(lang)].filter(Boolean).join(" · ")}</p>
-      {p.id===user.id?<p>{labels[p.status]} · {labels[p.role]}</p>:<form action={review}><input type="hidden" name="id" value={p.id}/>
+    {!error && data?.length===0 && <p>{es?"No hay cuentas con este estado.":"No accounts with this status."}</p>}
+    {(data as Entry[]|null)?.map(p=><article key={p.id} className={styles.card}><div className={styles.heading}><h2>{p.full_name || p.email}</h2><span className={styles.badge} data-status={p.status}>{labels[p.status]}</span></div><p className={styles.meta}>{[p.email,p.organization,p.title,new Date(p.applied_at).toLocaleDateString(lang)].filter(Boolean).join(" · ")}</p>
+      {p.id===user.id?<p>{labels[p.role]}</p>:<form className={styles.controls} action={review}><input type="hidden" name="id" value={p.id}/>
         <label>{es?"Estado":"Status"}<select name="status" defaultValue={p.status}>{states.map(s=><option key={s} value={s}>{labels[s]}</option>)}</select></label>
         <label>{es?"Rol":"Role"}<select name="role" defaultValue={p.role}>{roles.map(s=><option key={s} value={s}>{labels[s]}</option>)}</select></label>
-        <button className="button button-dark">{es?"Guardar":"Save"}</button></form>}
+        <button type="submit">{es?"Guardar":"Save"}</button></form>}
       {groupResult.error || assignmentResult.error ? <p role="alert">{es?"No se pudieron cargar las asignaciones.":"Unable to load assignments."}</p> :
         <details><summary>{es?"Junta y comisiones":"Board and commissions"}</summary>
           {groupResult.data?.map(group => {
