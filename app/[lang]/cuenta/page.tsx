@@ -16,6 +16,7 @@ export default async function Account({ params, searchParams }: {
     invalid: t("Revisá los datos del formulario.", "Check the form fields."),
     error: t("No se pudo completar la operación. Revisá tus datos e intentá de nuevo.", "We could not complete the request. Check your details and try again."),
     verify: t("Revisá tu correo, confirmá la cuenta y luego iniciá sesión aquí.", "Check your email, confirm your account, then sign in here."),
+    signin: t("Iniciá sesión con tu correo y contraseña. Si todavía no confirmaste el correo, revisá el enlace recibido.", "Sign in with your email and password. If you have not confirmed your email yet, check your confirmation link."),
     saved: t("Perfil guardado.", "Profile saved."),
   };
   const msg = messages[(await searchParams).msg ?? ""];
