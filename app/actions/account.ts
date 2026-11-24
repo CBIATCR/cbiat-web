@@ -55,3 +55,20 @@ export async function saveProfile(form: FormData) {
     is_public: form.get("is_public") === "on" }).eq("id", user.id).select("id").single();
   redirect(path + (error ? "?msg=error" : "?msg=saved"));
 }
+
+export async function changePhoto(form: FormData) {
+  const path = form.get("lang") === "en" ? "/en/cuenta" : "/es/cuenta";
+  const client = await accountClient();
+  const { data: { user } } = await client.auth.getUser();
+  if (!user) redirect(path);
+  const photos = client.from("profile_photos");
+  if (form.get("operation") === "remove") {
+    const { error } = await photos.delete().eq("profile_id", user.id);
+    redirect(path + (error ? "?msg=error" : "?msg=saved"));
+  }
+  const file = form.get("photo");
+  if (!(file instanceof File) || !file.size || file.size > 524288) redirect(path + "?msg=photo");
+  const image = Buffer.from(await file.arrayBuffer());
+  const { error } = await photos.upsert({ profile_id: user.id, image: "\\x" + image.toString("hex") });
+  redirect(path + (error ? "?msg=photo" : "?msg=saved"));
+}
