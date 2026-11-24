@@ -738,3 +738,33 @@ h1,h2,h3,p,a,span,strong{overflow-wrap:break-word}
 .account input:not([type=checkbox]):not([hidden]), .account textarea { font: inherit; width: 100%; padding: 0.65rem; border: 1px solid #87929c; border-radius: 0.35rem; }
 .account label:has(input[type=checkbox]) { display: block; }
 .account button { justify-self: start; }
+
+/* Account pages use a form-width layout beneath the shared header. */
+.account-page {
+  padding: clamp(16px, 3vw, 32px) 16px 48px;
+  background: var(--blue);
+}
+.account-page > .account {
+  width: 100%;
+  max-width: 52rem;
+  margin-inline: auto;
+  padding: 0;
+  gap: 1rem;
+}
+.account-page > .account-narrow { max-width: 36rem; }
+.account-page h1, .account-page h2, .account-page p { margin: 0; }
+.account-page h1 { font: 500 clamp(1.875rem, 4vw, 2.5rem)/1.1 Georgia, serif; }
+.account-page h2 { font-size: 1.5rem; line-height: 1.2; }
+.account-page .account-columns { gap: 1rem; align-items: start; }
+.account-page .account-columns form, .account-page .profile-fields {
+  padding: clamp(16px, 2.5vw, 24px);
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  min-width: 0;
+}
+.account-page label { gap: 0.35rem; }
+@media (max-width: 44rem) {
+  .account-page .account-columns { grid-template-columns: 1fr; }
+  .account-page > .account { max-width: 36rem; }
+}
