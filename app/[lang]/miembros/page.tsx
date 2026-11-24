@@ -1,4 +1,3 @@
-import { DirectoryTabs } from "@/components/directory-tabs";
 import { accountClient } from "@/lib/supabase/server";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import styles from "./directory.module.css";
@@ -81,7 +80,6 @@ export default async function Directory({ params, searchParams }: {
         <h1>{es ? "Directorio de personas" : "People directory"}</h1>
         {visible && <span className={styles.count}>{visible.length} {es ? (visible.length === 1 ? "perfil" : "perfiles") : (visible.length === 1 ? "profile" : "profiles")}</span>}
       </header>
-      <DirectoryTabs lang={lang} active="miembros"/>
       {options.length > 0 && <nav className={styles.filters} aria-label={es ? "Filtrar por junta o comisión" : "Filter by board or commission"}>
         <Link href={path} aria-current={!selected ? "page" : undefined}>{allLabel}</Link>
         {options.map(g => <Link key={g.id} href={{pathname:path, query:{grupo:g.id}}} aria-current={selected === g.id ? "page" : undefined}>{es ? g.name_es : g.name_en}</Link>)}
