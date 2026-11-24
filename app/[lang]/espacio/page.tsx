@@ -42,6 +42,7 @@ export default async function MemberSpace({params}: {params: Promise<{lang:strin
         </section>
         <nav className="chamber-links" aria-label={es ? "Accesos de la Cámara" : "Chamber links"}>
           <Link href={`/${lang}/miembros`}>{es ? "Directorio de personas" : "People directory"}<span aria-hidden="true">→</span></Link>
+          <Link href={`/${lang}/organizaciones`}>{es ? "Directorio de organizaciones" : "Organization directory"}<span aria-hidden="true">→</span></Link>
           <Link href={`/${lang}/espacio/organizaciones`}>{es ? "Mis organizaciones" : "My organizations"}<span aria-hidden="true">→</span></Link>
           {data.role === "admin" && <Link href={`/${lang}/admin`}>{es ? "Administrar cuentas" : "Manage accounts"}<span aria-hidden="true">→</span></Link>}
         </nav>
