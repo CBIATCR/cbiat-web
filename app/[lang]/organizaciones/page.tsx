@@ -3,7 +3,6 @@ import { accountClient } from "@/lib/supabase/server";
 import { isLocale } from "@/lib/i18n";
 import { kinds,type Organization } from "@/lib/organizations";
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import { DirectoryTabs } from "@/components/directory-tabs";
 import styles from "../miembros/directory.module.css";
 
 export const dynamic="force-dynamic";
@@ -21,7 +20,6 @@ export default async function Organizations({params}:{params:Promise<{lang:strin
   return <main className={styles.page}><div className={styles.inner}>
     <Breadcrumbs lang={lang} parent={profile?.status==="approved"?"espacio":undefined} current={title}/>
     <header className={styles.heading}><h1>{title}</h1></header>
-    <DirectoryTabs lang={lang} active="organizaciones"/>
     {!response || response.error ? <p role="alert">{es?"El directorio no está disponible.":"The directory is unavailable."}</p> :
       rows.length===0 ? <p className={styles.empty}>{es?"Todavía no hay organizaciones publicadas.":"No organizations have been published yet."}</p> :
       <div className={styles.grid}>{rows.map(org=><article key={org.id} className={styles.card}>
