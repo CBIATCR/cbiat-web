@@ -1,3 +1,5 @@
+import { Breadcrumbs } from "@/components/breadcrumbs";
+import styles from "../admin.module.css";
 import Link from "next/link";
 import { notFound,redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n";
@@ -19,18 +21,22 @@ export default async function Review({params,searchParams}:{params:Promise<{lang
     const {error}=await session.rpc("review_organization",{target:form.get("id"),expected_revision:form.get("revision"),decision:form.get("decision"),is_partner:form.has("partner")});
     redirect("/"+lang+"/admin/organizaciones?result="+(error?"error":"ok"));
   }
-  return <main className="account-page"><div className="account"><nav><Link href={`/${lang}/admin`}>← Admin</Link></nav>
+  return <main className="account-page"><div className={`account ${styles.panel}`}><Breadcrumbs lang={lang} parent="espacio" current={es?"Revisar organizaciones":"Review organizations"}/>
     <h1>{es?"Revisar organizaciones":"Review organizations"}</h1>
+    <nav className={styles.tabs} aria-label={es?"Administración":"Administration"}>
+      <Link href={`/${lang}/admin`} >{es?"Cuentas":"Accounts"}</Link>
+      <Link href={`/${lang}/admin/organizaciones`} aria-current="page">{es?"Organizaciones":"Organizations"}</Link>
+    </nav>
     {result && <p role="status">{result==="ok"?(es?"Decisión guardada.":"Decision saved."):(es?"No se guardó. Revisá la versión actual.":"Unable to save. Review the latest version.")}</p>}
     {error && <p role="alert">{es?"No se pudo cargar la lista.":"Unable to load listings."}</p>}
     {data?.length===0 && <p>{es?"Todavía no hay solicitudes.":"No submissions yet."}</p>}
-    {(data as ManagedOrganization[]|null)?.map(org=><article key={org.id} className="profile-fields">
-      <h2>{org.name}</h2><p>{[statusLabel(org.status,es),kinds[org.kind][es?0:1],org.location].filter(Boolean).join(" · ")}</p>
+    {(data as ManagedOrganization[]|null)?.map(org=><article key={org.id} className={styles.card}>
+      <div className={styles.heading}><h2>{org.name}</h2><span className={styles.badge} data-status={org.status}>{statusLabel(org.status,es)}</span></div><p className={styles.meta}>{[kinds[org.kind][es?0:1],org.location].filter(Boolean).join(" · ")}</p>
       {org.logo && <img src={org.logo} alt="" width={64} height={64} style={{objectFit:"contain"}}/>}
       <p>{org.description}</p><a href={org.website} rel="noreferrer">{org.website}</a>
       <form action={review}><input name="id" type="hidden" value={org.id}/><input name="revision" type="hidden" value={org.revision}/>
         <label><input type="checkbox" name="partner" defaultChecked={org.partner}/> Partner CBIAT</label>
-        <div><button className="button button-dark" name="decision" value="approved">{es?"Aprobar publicación":"Approve publication"}</button>
-        <button className="button" name="decision" value="rejected">{es?"Rechazar":"Reject"}</button></div>
+        <div className={styles.actions}><button name="decision" value="approved">{es?"Aprobar publicación":"Approve publication"}</button>
+        <button name="decision" value="rejected">{es?"Rechazar":"Reject"}</button></div>
       </form></article>)}</div></main>;
 }
