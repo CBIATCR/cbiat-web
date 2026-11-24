@@ -730,3 +730,68 @@ h1,h2,h3,p,a,span,strong{overflow-wrap:break-word}
 .mobile-nav-panel .mobile-nav-document:hover{
   background:var(--navy2);
 }
+
+.account, .account form, .account label { display: grid; gap: 0.75rem; }
+.account { padding-block: 3rem; gap: 1.5rem; }
+.account-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 2rem; }
+.account form { align-content: start; max-width: 36rem; }
+.account input:not([type=checkbox]):not([hidden]), .account textarea { font: inherit; width: 100%; padding: 0.65rem; border: 1px solid #87929c; border-radius: 0.35rem; }
+.account label:has(input[type=checkbox]) { display: block; }
+.account button { justify-self: start; }
+
+/* Account pages use a form-width layout beneath the shared header. */
+.account-page {
+  padding: clamp(16px, 3vw, 32px) 16px 48px;
+  background: var(--blue);
+}
+.account-page > .account {
+  width: 100%;
+  max-width: 52rem;
+  margin-inline: auto;
+  padding: 0;
+  gap: 1rem;
+}
+.account-page > .account-narrow { max-width: 36rem; }
+.account-page h1, .account-page h2, .account-page p { margin: 0; }
+.account-page h1 { font: 500 clamp(1.875rem, 4vw, 2.5rem)/1.1 Georgia, serif; }
+.account-page h2 { font-size: 1.5rem; line-height: 1.2; }
+.account-page .account-columns { gap: 1rem; align-items: start; }
+.account-page .account-columns form, .account-page .profile-fields {
+  padding: clamp(16px, 2.5vw, 24px);
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  min-width: 0;
+}
+.account-page label { gap: 0.35rem; }
+@media (max-width: 44rem) {
+  .account-page .account-columns { grid-template-columns: 1fr; }
+  .account-page > .account { max-width: 36rem; }
+}
+
+.chamber-space { color: var(--navy); }
+.chamber-profile {
+  background: var(--navy);
+  color: var(--paper);
+  padding: clamp(20px, 4vw, 32px);
+  border-radius: 12px;
+  display: grid;
+  gap: 16px;
+  justify-items: start;
+}
+.chamber-identity { display: flex; gap: 16px; align-items: center; min-width: 0; }
+.chamber-avatar {
+  flex: none; width: 64px; height: 64px; border-radius: 50%;
+  display: grid; place-items: center; object-fit: cover;
+  background: var(--cream); color: var(--navy); font: 500 1.5rem Georgia, serif;
+}
+.chamber-identity p, .chamber-visibility { color: #d8e2ed; }
+.chamber-edit { background: var(--gold); color: var(--navy); min-height: 44px; border-radius: 6px; }
+.chamber-links { display: grid; gap: 10px; }
+.chamber-links a {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  background: var(--paper); border: 1px solid var(--line); border-radius: 8px;
+  padding: 14px 18px; font-weight: 700;
+}
+.chamber-links a:hover { border-color: var(--navy2); }
+.chamber-links a:focus-visible, .chamber-edit:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }

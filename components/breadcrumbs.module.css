@@ -1,0 +1,7 @@
+.trail { color: var(--navy2); font-size: .875rem; line-height: 1.5; }
+.trail ol { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .55rem; margin: 0; padding: 0; list-style: none; }
+.trail li { display: inline-flex; align-items: baseline; gap: .55rem; }
+.trail a { text-decoration: underline; text-underline-offset: .2em; }
+.trail a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.trail [aria-current] { color: var(--ink); }
+.trail [aria-hidden] { color: var(--muted); }
