@@ -87,6 +87,7 @@ export default async function LocaleLayout({
               <p>{d.footer.tagline}</p>
             </div>
             <div className="footer-meta">
+              <div><Link href={`/${lang}/cuenta`}>{lang === "es" ? "Mi cuenta" : "My account"}</Link></div>
               <div><Link href={`/${lang}/miembros`}>{lang === "es" ? "Directorio de personas" : "People directory"}</Link></div>
               <div><span>{d.footer.contact}</span><a href={`mailto:${d.footer.email}`}>{d.footer.email}</a></div>
               <div><span>{d.footer.location}</span><a href="https://cbiat.org">cbiat.org</a></div>
