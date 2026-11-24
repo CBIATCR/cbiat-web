@@ -1,3 +1,4 @@
+import { socialNetwork } from "@/lib/profile-links";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isLocale } from "@/lib/i18n";
@@ -82,7 +83,7 @@ export default async function Directory({ params, searchParams }: {
               {p.groups.length > 0 && <p>{p.groups.map(g => es ? g.name_es : g.name_en).join(" · ")}</p>}
               {Array.from(new Set(p.social_links)).map(value => {
                 const url = socialLink(value);
-                return url && <p key={value}><a href={url.href} rel="me noreferrer">{url.hostname}</a></p>;
+                return url && <p key={value}><a href={url.href} rel="me noreferrer">{socialNetwork(value) ?? url.hostname}</a></p>;
               })}
             </article>
           ))}
