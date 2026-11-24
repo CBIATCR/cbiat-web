@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { notFound, redirect } from "next/navigation";
 import { accountClient } from "@/lib/supabase/server";
@@ -51,6 +52,7 @@ export default async function Admin({ params, searchParams }: {
     redirect("/"+lang+"/admin?result="+(error?"error":"ok"));
   }
   return <main className="account-page"><div className="account"><Breadcrumbs lang={lang} parent="espacio" current={es ? "Administrar cuentas" : "Manage accounts"} /><h1>{es?"Administrar cuentas":"Manage accounts"}</h1>
+    <Link href={`/${lang}/admin/organizaciones`}>{es ? "Revisar organizaciones →" : "Review organizations →"}</Link>
     <form><label>{es?"Estado":"Status"}<select name="status" defaultValue={status ?? ""}><option value="">{es?"Todos":"All"}</option>{states.map(s=><option key={s} value={s}>{labels[s]}</option>)}</select></label><button>{es?"Filtrar":"Filter"}</button></form>
     <details><summary>{es?"Crear comisión":"Create commission"}</summary>
       <form action={manageGroup}>
