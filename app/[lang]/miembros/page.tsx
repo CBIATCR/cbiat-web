@@ -1,3 +1,4 @@
+import styles from "./directory.module.css";
 import { socialNetwork } from "@/lib/profile-links";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -59,38 +60,38 @@ export default async function Directory({ params, searchParams }: {
   }
   const visible = selected ? people?.filter(p => p.groups.some(g => g.id === selected)) : people;
   const path = "/" + lang + "/miembros";
+  const allLabel = es ? "Todas las personas" : "Everyone";
+  const options = Array.from(groups.values()).sort((a,b) => (es ? a.name_es : a.name_en).localeCompare(es ? b.name_es : b.name_en, lang));
   return (
-    <main className="work">
-      <div className="shell">
+    <main className={styles.page}><div className={styles.inner}>
+      <header className={styles.heading}>
         <h1>{es ? "Directorio de personas" : "People directory"}</h1>
-        {groups.size > 0 && (
-          <form action={path}>
-            <label htmlFor="grupo">{es ? "Junta o comisión" : "Board or commission"} </label>
-            <select id="grupo" name="grupo" defaultValue={selected ?? ""}>
-              <option value="">{es ? "Todas" : "All"}</option>
-              {Array.from(groups.values()).map(g => <option value={g.id} key={g.id}>{es ? g.name_es : g.name_en}</option>)}
-            </select>
-            <button className="button button-dark">{es ? "Filtrar" : "Filter"}</button>
-          </form>
-        )}
-        {people === null ? <p role="status">{es ? "El directorio no está disponible en este momento." : "The directory is currently unavailable."}</p>
-          : !visible?.length && <p>{es ? "No hay perfiles públicos para mostrar." : "There are no public profiles to display."} {selected && <Link href={path}>{es ? "Ver todos" : "View all"}</Link>}</p>}
-        <div className="cards">
-          {visible?.map(p => (
-            <article key={p.id}>
-              {p.has_photo && <img src={`/api/profile-photo/${p.id}`} alt="" loading="lazy" width={72} height={72} style={{objectFit:"cover",borderRadius:"50%"}}/>}
-              <h2>{p.full_name}</h2>
-              <p>{[p.title, p.organization].filter(Boolean).join(" · ")}</p>
-              {p.biography && <p>{p.biography}</p>}
-              {p.groups.length > 0 && <p>{p.groups.map(g => es ? g.name_es : g.name_en).join(" · ")}</p>}
-              {Array.from(new Set(p.social_links)).map(value => {
-                const url = socialLink(value);
-                return url && <p key={value}><a href={url.href} rel="me noreferrer">{socialNetwork(value) ?? url.hostname}</a></p>;
-              })}
-            </article>
-          ))}
-        </div>
-      </div>
-    </main>
+        {visible && <span className={styles.count}>{visible.length} {es ? (visible.length === 1 ? "perfil" : "perfiles") : (visible.length === 1 ? "profile" : "profiles")}</span>}
+      </header>
+      {options.length > 0 && <nav className={styles.filters} aria-label={es ? "Filtrar por junta o comisión" : "Filter by board or commission"}>
+        <Link href={path} aria-current={!selected ? "page" : undefined}>{allLabel}</Link>
+        {options.map(g => <Link key={g.id} href={{pathname:path, query:{grupo:g.id}}} aria-current={selected === g.id ? "page" : undefined}>{es ? g.name_es : g.name_en}</Link>)}
+      </nav>}
+      {!visible?.length ? <div className={styles.empty} role="status">
+        <p>{people === null ? (es ? "El directorio no está disponible en este momento." : "The directory is currently unavailable.") :
+          selected ? (es ? "No hay perfiles públicos en este grupo." : "No public profiles in this group.") :
+          (es ? "Todavía no hay perfiles públicos." : "There are no public profiles yet.")}</p>
+        {selected && <Link href={path}>{allLabel}</Link>}
+      </div> : <div className={styles.grid}>{visible.map(p => {
+        const name = p.full_name.trim() || (es ? "Participante" : "Participant");
+        const role = [p.title,p.organization].filter(Boolean).join(" · ");
+        const links = Array.from(new Set(p.social_links)).map(socialLink).filter((url): url is URL => url !== null);
+        return <article key={p.id} className={styles.card}>
+          <div className={styles.identity}>
+            {p.has_photo ? <img className={styles.avatar} src={`/api/profile-photo/${p.id}`} alt="" loading="lazy" width={56} height={56}/> :
+              <span className={styles.avatar} aria-hidden="true">{name.split(/\s+/).slice(0,2).map(word => word[0]).join("").toUpperCase()}</span>}
+            <div><h2>{name}</h2>{role && <p className={styles.role}>{role}</p>}</div>
+          </div>
+          {p.groups.length > 0 && <div className={styles.tags}>{p.groups.map(g => <span key={g.id}>{es ? g.name_es : g.name_en}</span>)}</div>}
+          {p.biography && <p className={styles.bio}>{p.biography}</p>}
+          {links.length > 0 && <div className={styles.links}>{links.map((url,i) => <a key={i} href={url.href} rel="me noreferrer">{socialNetwork(url.href) ?? url.hostname}</a>)}</div>}
+        </article>;
+      })}</div>}
+    </div></main>
   );
 }
